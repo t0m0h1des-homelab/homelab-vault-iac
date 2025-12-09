@@ -1,0 +1,9 @@
+# Vault Connection Info
+# (This matches the IP assigned in step 01_pve_vm)
+vault_address = "http://10.0.0.50:8200"
+
+# Initial Root Token (Retrieved from 'vault operator init')
+vault_token   = "hvs.xxxxxxxxxxxxxxxxxxxx"
+
+# Configuration
+kv_mount_path = "secret"

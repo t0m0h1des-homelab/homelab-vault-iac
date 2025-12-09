@@ -1,0 +1,22 @@
+# Proxmox API Connection
+pve_endpoint     = "https://192.168.1.33:8006/"
+pve_user         = "terraform-admin@pve"
+pve_token_id     = "tf-token"
+pve_token_secret = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# Target Environment
+target_node      = "z840"
+template_id      = 9000
+
+# VM Specs (Overrides)
+vm_name          = "vault-prod-01"
+vm_cpu_cores     = 2
+vm_memory        = 4096
+vm_disk_storage  = "local-zfs"
+
+# Network
+vm_ipv4_address  = "10.0.0.50/24"
+vm_gateway       = "10.0.0.1"
+
+# Access
+ssh_public_key   = "ssh-ed25519 AAAA..."
