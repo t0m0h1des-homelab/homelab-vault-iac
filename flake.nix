@@ -23,6 +23,8 @@
             vault
           ];
 
+          ANSIBLE_HOST_KEY_CHECKING = "False";
+
           shellHook = ''
             echo "🚀 IaC Environment Loaded"
             echo "Terraform: $(terraform --version)"
