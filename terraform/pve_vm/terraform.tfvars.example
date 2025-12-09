@@ -12,7 +12,7 @@ template_id      = 9000
 vm_name          = "vault-prod-01"
 vm_cpu_cores     = 2
 vm_memory        = 4096
-vm_disk_storage  = "local-zfs"
+vm_disk_storage  = "local-lvm"
 
 # Network
 vm_ipv4_address  = "10.0.0.50/24"
