@@ -1,0 +1,56 @@
+---
+- name: Setup HashiCorp Vault
+  hosts: all
+  become: true
+  vars:
+    vault_version: "latest"
+
+  tasks:
+    - name: 必要なパッケージのインストール
+      apt:
+        name: [curl, gpg, lsb-release]
+        state: present
+        update_cache: yes
+
+    - name: HashiCorp GPGキーの追加
+      shell: |
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+      args:
+        creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+    - name: HashiCorpリポジトリの追加
+      lineinfile:
+        path: /etc/apt/sources.list.d/hashicorp.list
+        line: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+        create: yes
+
+    - name: Vaultのインストール
+      apt:
+        name: vault
+        state: present
+        update_cache: yes
+
+    - name: Vault設定ファイルの配置 (config.hcl)
+      copy:
+        dest: /etc/vault.d/vault.hcl
+        content: |
+          ui = true
+          disable_mlock = true
+
+          storage "file" {
+            path = "/opt/vault/data"
+          }
+
+          listener "tcp" {
+            address     = "0.0.0.0:8200"
+            tls_disable = 1
+          }
+
+          api_addr = "http://{{ ansible_default_ipv4.address }}:8200"
+          cluster_addr = "http://{{ ansible_default_ipv4.address }}:8201"
+
+    - name: Vaultサービスの有効化と起動
+      systemd:
+        name: vault
+        state: restarted
+        enabled: yes
