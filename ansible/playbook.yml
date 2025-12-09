@@ -1,33 +1,21 @@
 ---
-- name: Setup HashiCorp Vault
+- name: Setup HashiCorp Vault on Fedora
   hosts: all
   become: true
   vars:
     vault_version: "latest"
 
   tasks:
-    - name: 必要なパッケージのインストール
-      apt:
-        name: [curl, gpg, lsb-release]
-        state: present
-        update_cache: yes
-
-    - name: HashiCorp GPGキーの追加
-      shell: |
-        curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-      args:
-        creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
-
-    - name: HashiCorpリポジトリの追加
-      lineinfile:
-        path: /etc/apt/sources.list.d/hashicorp.list
-        line: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
-        create: yes
+    - name: HashiCorpリポジトリファイルの配置
+      get_url:
+        url: "https://rpm.releases.hashicorp.com/fedora/hashicorp.repo"
+        dest: /etc/yum.repos.d/hashicorp.repo
+        mode: '0644'
 
     - name: Vaultのインストール
-      apt:
+      dnf:
         name: vault
-        state: present
+        state: latest
         update_cache: yes
 
     - name: Vault設定ファイルの配置 (config.hcl)
