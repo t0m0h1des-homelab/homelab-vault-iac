@@ -1,16 +1,16 @@
-# Vault on Proxmox LXC (IaC)
+# Vault on Proxmox VM (IaC)
 
 ## Overview
 
-This repository contains Infrastructure as Code (IaC) to deploy **HashiCorp Vault** on a **Proxmox LXC** container.
+This repository contains Infrastructure as Code (IaC) to deploy **HashiCorp Vault** on a **Proxmox VM** (Virtual Machine).
 
-* **Terraform:** Provisions the LXC container on Proxmox VE.
-* **Ansible:** Installs Vault, configures systemd services, and applies configuration files within the LXC.
+* **Terraform:** Provisions the Virtual Machine on Proxmox VE.
+* **Ansible:** Installs Vault, configures systemd services, and applies configuration files within the VM.
 
 ## Architecture
 
-1.  **Provisioning:** Terraform communicates with the Proxmox API to create a lightweight LXC container (Debian/Ubuntu based).
-2.  **Configuration Management:** Ansible connects via SSH to the created container to install the Vault binary, configure `systemd`, and apply the Config (HCL).
+1.  **Provisioning:** Terraform communicates with the Proxmox API to create a Virtual Machine (Debian/Ubuntu based).
+2.  **Configuration Management:** Ansible connects via SSH to the created VM to install the Vault binary, configure `systemd`, and apply the Config (HCL).
 3.  **Initialization:** (Manual Step) The operator runs `vault operator init` to generate Unseal Keys and the Root Token.
 4.  **Internal Configuration:** Terraform (Vault Provider) applies logical configurations—such as policies, Auth Methods, and Secret Engines—using the token obtained from initialization.
 
@@ -128,5 +128,5 @@ terraform apply
 
 ## Technical Notes
 
-  * **Memory Lock (mlock):** Since `mlock` system calls are often restricted in container environments like Proxmox LXC, `disable_mlock = true` is applied in the Ansible configuration.
+  * **Memory Lock (mlock):** The Ansible configuration applies `disable_mlock = true` for simplicity. If you wish to enable `mlock` in production to prevent swapping, consider updating `vault.hcl` and granting appropriate capabilities via `setcap`.
   * **Storage:** The default configuration uses the filesystem (`file`) backend. Consider switching to Raft storage if high availability is required.

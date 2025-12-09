@@ -1,16 +1,16 @@
-# Vault on Proxmox LXC (IaC)
+# Vault on Proxmox VM (IaC)
 
 ## 概要
 
-本リポジトリは、**Proxmox LXC** コンテナ上に **HashiCorp Vault** をデプロイするためのIaCコードを含む。
+本リポジトリは、**Proxmox VE** 上の **仮想マシン(VM)** に **HashiCorp Vault** をデプロイするためのIaCコードを含む。
 
-* **Terraform:** Proxmox VE上でのLXCコンテナの払い出し（プロビジョニング）。
-* **Ansible:** LXC内へのVaultのインストール、設定ファイルの配置、サービスの起動。
+* **Terraform:** Proxmox VE上でのVMの払い出し（プロビジョニング）。
+* **Ansible:** VM内へのVaultのインストール、設定ファイルの配置、サービスの起動。
 
 ## アーキテクチャ
 
-1.  **プロビジョニング:** TerraformがProxmox APIを叩き、軽量なLXCコンテナ（Debian/Ubuntuベース）を作成する。
-2.  **構成管理:** Ansibleが作成されたコンテナへSSH接続し、Vaultバイナリのインストール、`systemd`の設定、Config(HCL)の適用を行う。
+1.  **プロビジョニング:** TerraformがProxmox APIを叩き、仮想マシン（Debian/Ubuntuベース）を作成する。
+2.  **構成管理:** Ansibleが作成されたVMへSSH接続し、Vaultバイナリのインストール、`systemd`の設定、Config(HCL)の適用を行う。
 3.  **初期化:** （手動手順）オペレーターが `vault operator init` を実行し、Unseal KeyとRoot Tokenを発行する。
 4.  **内部設定:** Terraform (Vault Provider) を使用し、初期化で得られたトークンを用いて、ポリシー、Auth Method、Secret Engineなどの論理設定をコードベースで適用する。
 
@@ -26,21 +26,22 @@
 
 ```
 .
-├── flake.nix                # 開発環境定義 (Terraform, Ansible, Vault CLI)
-├── .envrc                   # direnv設定
+├── flake.nix                \# 開発環境定義 (Terraform, Ansible, Vault CLI)
+├── .envrc                   \# direnv設定
 ├── terraform/
-│   ├── pve_vm/           # [Step 1] VMプロビジョニング用
+│   ├── pve\_vm/              \# [Step 1] VMプロビジョニング用
 │   │   ├── main.tf
-│   │   ├── variables.tf     # 変数定義
-│   │   ├── provider.tf      # bpg/proxmox プロバイダ設定
-│   │   └── terraform.tfvars # (git対象外) 実環境のパラメータ
-│   └── vault_config/     # [Step 3] Vault内部設定用
+│   │   ├── variables.tf     \# 変数定義
+│   │   ├── provider.tf      \# bpg/proxmox プロバイダ設定
+│   │   └── terraform.tfvars \# (git対象外) 実環境のパラメータ
+│   └── vault\_config/        \# [Step 3] Vault内部設定用
 │       ├── main.tf
 │       ├── variables.tf
-│       ├── provider.tf      # hashicorp/vault プロバイダ設定
-│       └── terraform.tfvars # (git対象外) 接続先とトークン
-└── ansible/                 # [Step 2] インストール・起動用
-    └── playbook.yml
+│       ├── provider.tf      \# hashicorp/vault プロバイダ設定
+│       └── terraform.tfvars \# (git対象外) 接続先とトークン
+└── ansible/                 \# [Step 2] インストール・起動用
+└── playbook.yml
+
 ```
 
 ## 使用方法
@@ -128,5 +129,5 @@ terraform apply
 
 ## 技術的メモ
 
-* **メモリロック (mlock):** Proxmox LXCなどのコンテナ環境では `mlock` システムコールが制限される場合があるため、Ansible設定にて `disable_mlock = true` を適用している。
+* **メモリロック (mlock):** 本構成ではAnsible設定にて `disable_mlock = true` を適用している。本番環境でスワップを防ぐために `mlock` を有効化する場合は、`vault.hcl` の設定変更および `setcap` コマンドによる権限付与を検討すること。
 * **ストレージ:** デフォルト構成ではファイルシステム (`file`) をバックエンドに使用している。可用性が求められる場合はRaftストレージへの変更を検討すること。
