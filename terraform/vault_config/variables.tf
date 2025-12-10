@@ -1,16 +1,28 @@
+# --- Provider用 (Vaultへの接続) ---
 variable "vault_address" {
-  description = "URL of the Vault server (e.g., http://10.0.0.50:8200)"
+  description = "Vaultサーバーのアドレス (例: http://192.168.1.50:8200)"
   type        = string
 }
 
 variable "vault_token" {
-  description = "Vault Root Token or Admin Token for configuration"
+  description = "Terraform実行用のVaultトークン (Root Tokenなど)"
   type        = string
   sensitive   = true
 }
 
-variable "kv_mount_path" {
-  description = "Path to mount the KV secret engine"
+# --- Main用 (K8s認証連携設定) ---
+variable "k8s_host" {
+  description = "Vaultから見たK8s APIのURL (例: https://192.168.1.10:6443)"
   type        = string
-  default     = "secret"
+}
+
+variable "k8s_ca_cert" {
+  description = "K8sのCA証明書 (PEM形式)"
+  type        = string
+}
+
+variable "vault_reviewer_token" {
+  description = "VaultがK8s APIを叩くためのServiceAccountトークン"
+  type        = string
+  sensitive   = true
 }
