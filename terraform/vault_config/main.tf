@@ -35,7 +35,7 @@ resource "vault_auth_backend" "kubernetes" {
 resource "vault_kubernetes_auth_backend_config" "config" {
   backend         = vault_auth_backend.kubernetes.path
   kubernetes_host = var.k8s_host
-  kubernetes_ca_cert = var.k8s_ca_cert
+  kubernetes_ca_cert = file(var.k8s_ca_cert)
   token_reviewer_jwt = var.vault_reviewer_token
 
   # 自己署名証明書などで検証エラーが出る場合は一旦 true に

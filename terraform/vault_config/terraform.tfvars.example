@@ -2,8 +2,10 @@
 # (This matches the IP assigned in step 01_pve_vm)
 vault_address = "http://10.0.0.50:8200"
 
+# K8s Info
+k8s_host             = "https://10.0.0.10:6443"
+k8s_ca_cert          = "./k8s-ca.crt"
+vault_reviewer_token = "eyJxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
 # Initial Root Token (Retrieved from 'vault operator init')
 vault_token   = "hvs.xxxxxxxxxxxxxxxxxxxx"
-
-# Configuration
-kv_mount_path = "secret"
